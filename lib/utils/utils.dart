@@ -1,10 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:store_redirect/store_redirect.dart';
+import 'dart:math';
+import 'dart:developer' as Log;
 
 /// Created by daewubintara on
 /// 09, September 2020 11.03
@@ -249,6 +250,14 @@ class Utilities {
   }
 
   void logWhenDebug(String tag, String message) {
-    if (kDebugMode) log("$tag => ${message.toString()}");
+    if (kDebugMode) Log.log("$tag => ${message.toString()}");
+  }
+
+  static getFileSize(String filepath, int decimals) async {
+    var file = File(filepath);
+    int bytes = await file.length();
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    return (bytes / pow(1024, 2));
   }
 }
