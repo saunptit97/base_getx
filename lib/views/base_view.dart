@@ -62,7 +62,13 @@ abstract class BaseView<T extends BaseController> extends StatelessWidget {
     return GetBuilder<T>(
       init: controller,
       builder: (controller) {
-        return vBuilder(context);
+        return RefreshIndicator(
+          key: controller.refreshIndicatorKey,
+          onRefresh: () async {
+            await controller.onRefresh();
+          },
+          child: vBuilder(context),
+        );
       },
     );
   }

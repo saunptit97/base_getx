@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:base_getx/controller/base_controller.dart';
+import 'package:base_getx/utils/logger.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart';
 
@@ -12,20 +13,22 @@ class GetXNetworkManager extends BaseController {
   late StreamSubscription _streamSubscription;
   @override
   void onInit() {
-    GetConnectionType();
+    getConnectType();
     _streamSubscription =
         _connectivity.onConnectivityChanged.listen(_updateState);
+    super.onInit();
   }
 
   // a method to get which connection result, if you we connected to internet or no if yes then which network
-  Future<void> GetConnectionType() async {
-    var connectivityResult;
+  Future<dynamic> getConnectType() async {
+    ConnectivityResult? connectivityResult;
     try {
       connectivityResult = await (_connectivity.checkConnectivity());
+      return _updateState(connectivityResult);
     } on PlatformException catch (e) {
-      print(e);
+      Logger.showLog("ERROR", e.toString());
     }
-    return _updateState(connectivityResult);
+    return;
   }
 
   // state update, of network, if you are connected to WIFI connectionType will get set to 1,

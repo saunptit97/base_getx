@@ -1,8 +1,7 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:base_getx/api/result.dart';
-import 'package:flutter/foundation.dart';
+import 'package:base_getx/utils/logger.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -46,7 +45,10 @@ class ApiServiceBase {
     bool withToken = false,
   }) async {
     return await _api.postData(
-        endPoint: endPoint, data: data, withToken: withToken);
+      endPoint: endPoint,
+      data: data,
+      withToken: withToken,
+    );
   }
 }
 
@@ -73,7 +75,7 @@ class _Api extends GetConnect {
         // String token = box.read(MyConfig.TOKEN_STRING_KEY);
         // if (token != null) request.headers['Authorization'] = "Bearer $token";
       }
-      // _showLogWhenDebug("HEADERS", request.headers.toString());
+      // Logger.showLog("HEADERS", request.headers.toString());
       return request;
     });
     super.onInit();
@@ -90,10 +92,10 @@ class _Api extends GetConnect {
     _withToken = withToken;
     onInit();
 
-    _showLogWhenDebug(method == Method.GET ? "GET" : "POST",
+    Logger.showLog(method == Method.GET ? "GET" : "POST",
         httpClient.baseUrl! + API_NAME + endPoint);
-    _showLogWhenDebug("PARAMS", query.toString());
-    _showLogWhenDebug("TOKEN", _withToken.toString());
+    Logger.showLog("PARAMS", query.toString());
+    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res;
       if (method == Method.GET) {
@@ -103,20 +105,20 @@ class _Api extends GetConnect {
       }
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        _showLogWhenDebug("LOADED", res.bodyString);
+        Logger.showLog("LOADED", res.bodyString);
         // _result.status = true;
         // _result.body = res.body;
-        _showLogWhenDebug("PARSING", "SUCCESS");
+        Logger.showLog("PARSING", "SUCCESS");
         return _result;
       } else {
-        _showLogWhenDebug("ERROR 0", res.bodyString);
+        Logger.showLog("ERROR 0", res.bodyString);
         // _result.status = true;
         // _result.isError = true;
         // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
         return _result;
       }
     } catch (e) {
-      _showLogWhenDebug("ERROR 1", e.toString());
+      Logger.showLog("ERROR 1", e.toString());
       // _result.status = true;
       // _result.isError = true;
       return _result;
@@ -132,27 +134,27 @@ class _Api extends GetConnect {
   }) async {
     _withToken = withToken;
     onInit();
-    _showLogWhenDebug("GET", httpClient.baseUrl! + API_NAME + endPoint);
-    _showLogWhenDebug("PARAMS", query.toString());
-    _showLogWhenDebug("TOKEN", _withToken.toString());
+    Logger.showLog("GET", httpClient.baseUrl! + API_NAME + endPoint);
+    Logger.showLog("PARAMS", query.toString());
+    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res = await get(API_NAME + endPoint, query: query);
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        _showLogWhenDebug("LOADED", res.bodyString!);
+        Logger.showLog("LOADED", res.bodyString!);
         // _result = Result.fromJson(res.bodyString!);
         // _result.body = res.body;
-        _showLogWhenDebug("PARSING", "SUCCESS");
+        Logger.showLog("PARSING", "SUCCESS");
         return _result;
       } else {
-        _showLogWhenDebug("ERROR 0", res.bodyString!);
+        Logger.showLog("ERROR 0", res.bodyString!);
         // _result.status = true;
         // _result.isError = true;
         // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
         return _result;
       }
     } catch (e) {
-      _showLogWhenDebug("ERROR 1", e.toString());
+      Logger.showLog("ERROR 1", e.toString());
       // _result.status = true;
       // _result.isError = true;
       return _result;
@@ -168,27 +170,27 @@ class _Api extends GetConnect {
   }) async {
     _withToken = withToken;
     onInit();
-    _showLogWhenDebug("POST", httpClient.baseUrl! + API_NAME + endPoint);
-    _showLogWhenDebug("PARAMS", data.toString());
-    _showLogWhenDebug("TOKEN", _withToken.toString());
+    Logger.showLog("POST", httpClient.baseUrl! + API_NAME + endPoint);
+    Logger.showLog("PARAMS", data.toString());
+    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res = await httpClient.post(API_NAME + endPoint, body: data);
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        _showLogWhenDebug("LOADED", res.bodyString!);
+        Logger.showLog("LOADED", res.bodyString!);
         // _result = Result.fromJson(res.bodyString!);
         // _result.body = res.body;
-        _showLogWhenDebug("PARSING", "SUCCESS");
+        Logger.showLog("PARSING", "SUCCESS");
         return _result;
       } else {
-        _showLogWhenDebug("ERROR 0", res.bodyString!);
+        Logger.showLog("ERROR 0", res.bodyString!);
         // _result.status = true;
         // _result.isError = true;
         // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
         return _result;
       }
     } catch (e) {
-      _showLogWhenDebug("ERROR 1", e.toString());
+      Logger.showLog("ERROR 1", e.toString());
       // _result.status = true;
       // _result.isError = true;
       return _result;
@@ -196,7 +198,5 @@ class _Api extends GetConnect {
   }
 
   /// TO SHOW THE LOG WHEN DEBUG MODE TRUE
-  _showLogWhenDebug(String status, String e) {
-    if (kDebugMode) log("$status => ${e.toString()}");
-  }
+
 }

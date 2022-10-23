@@ -1,9 +1,9 @@
 import 'package:base_getx/repository/repositories.dart';
+import 'package:base_getx/utils/logger.dart';
 import 'package:base_getx/utils/utils.dart';
 import 'package:base_getx/widget/base_common_widget.dart';
 import 'package:base_getx/widget/widget_state_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 export 'package:get/get.dart';
@@ -34,25 +34,28 @@ class BaseController extends GetxController
   bool isLoadMore = false;
   bool withScrollController = false;
   ScrollController? scrollController;
-
+  final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
   set setEnableScrollController(bool value) => withScrollController = value;
 
   @override
   void onInit() {
     super.onInit();
     if (withScrollController) {
-      logWhenDebug("SCROLL CONTROLLER ENABLE on ${Get.currentRoute}",
-          withScrollController.toString());
+      Logger.showLog(
+        "SCROLL CONTROLLER ENABLE on ${Get.currentRoute}",
+        withScrollController.toString(),
+      );
       scrollController = ScrollController();
       scrollController?.addListener(_scrollListener);
     }
   }
 
-  void onRefresh() {}
+  Future<void> onRefresh() async {}
 
-  void onLoadMore() {}
+  Future<void> onLoadMore() async {}
 
-  void _scrollListener() {
+  void _scrollListener() async {
     if (scrollController != null &&
         scrollController!.offset >=
             scrollController!.position.maxScrollExtent &&
@@ -60,7 +63,7 @@ class BaseController extends GetxController
       if (!isLoadMore) {
         isLoadMore = true;
         update();
-        onLoadMore();
+        await onLoadMore();
       }
       _innerBoxScrolled();
     }
