@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:store_redirect/store_redirect.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'dart:math';
+import 'package:timeago/timeago.dart' as timeago;
 
 ///
 /// --------------------------------------------
@@ -112,5 +114,22 @@ class Utilities {
     var file = File(filepath);
     int bytes = await file.length();
     return (bytes / pow(1024, 2));
+  }
+
+  static rateApp(String appId) async {
+    final InAppReview _inAppReview = InAppReview.instance;
+    final isAvailable = await _inAppReview.isAvailable();
+    if (isAvailable) {
+      _inAppReview.openStoreListing(
+        appStoreId: appId,
+        microsoftStoreId: '...',
+      );
+    }
+  }
+
+  static String timeAgo(DateTime date, String locale) {
+    timeago.setLocaleMessages('en', timeago.EnMessages());
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
+    return timeago.format(date, locale: locale);
   }
 }
