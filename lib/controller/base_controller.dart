@@ -49,6 +49,11 @@ class BaseController extends GetxController
     nonPersonalizedAds: true,
   );
 
+  /// Inline ads
+  String bannerAdId = 'ca-app-pub-3940256099942544/9214589741';
+  BannerAd? _anchoredAdaptiveAd;
+  Orientation? _currentOrientation;
+
   @override
   void onInit() {
     super.onInit();
@@ -61,6 +66,69 @@ class BaseController extends GetxController
       scrollController?.addListener(_scrollListener);
     }
     createInterstitialAd();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    loadAd();
+  }
+
+  void loadAd() async {
+    await _anchoredAdaptiveAd?.dispose();
+    _anchoredAdaptiveAd = null;
+    update();
+    _currentOrientation = MediaQuery.of(Get.context!).orientation;
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+            MediaQuery.of(Get.context!).size.width.truncate());
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      return;
+    }
+
+    _anchoredAdaptiveAd = BannerAd(
+      adUnitId: bannerAdId,
+      size: size,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          // When the ad is loaded, get the ad size and use it to set
+          // the height of the ad container.
+          _anchoredAdaptiveAd = ad as BannerAd;
+          update();
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+        },
+      ),
+    );
+    return _anchoredAdaptiveAd!.load();
+  }
+
+  Widget getAdWidget() {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (_currentOrientation != null &&
+            _currentOrientation == orientation &&
+            _anchoredAdaptiveAd != null) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: SizedBox(
+              width: _anchoredAdaptiveAd!.size.width.toDouble(),
+              height: _anchoredAdaptiveAd!.size.height.toDouble(),
+              child: AdWidget(ad: _anchoredAdaptiveAd!),
+            ),
+          );
+        }
+        // Reload the ad if the orientation changes.
+        if (_currentOrientation != orientation) {
+          _currentOrientation = orientation;
+          loadAd();
+        }
+        return Container();
+      },
+    );
   }
 
   Future<void> onRefresh() async {}
@@ -103,7 +171,7 @@ class BaseController extends GetxController
         ));
   }
 
-  void showInterstitialAd() {
+  Future<void> showInterstitialAd() async {
     if (_interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
       return;
@@ -122,8 +190,9 @@ class BaseController extends GetxController
         createInterstitialAd();
       },
     );
-    _interstitialAd!.show();
+    await _interstitialAd!.show();
     _interstitialAd = null;
+    createInterstitialAd();
   }
 
   void _innerBoxScrolled() {
@@ -139,5 +208,12 @@ class BaseController extends GetxController
       //   update();
       // }
     }
+  }
+
+  @override
+  void onClose() {
+    _interstitialAd?.dispose();
+    _anchoredAdaptiveAd?.dispose();
+    super.onClose();
   }
 }
