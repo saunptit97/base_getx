@@ -51,9 +51,10 @@ abstract class BaseViewModel<T extends BaseController> extends StatelessWidget {
 /// Please extends to your [Screen] / [View] / [Page].
 /// read the [Example] above.
 abstract class BaseView<T extends BaseController> extends StatelessWidget {
-  const BaseView({Key? key}) : super(key: key);
+  const BaseView({Key? key, this.enableRefresh = true}) : super(key: key);
 
   final String tag = '';
+  final bool enableRefresh;
 
   T get controller => GetInstance().find<T>(tag: tag);
 
@@ -62,13 +63,17 @@ abstract class BaseView<T extends BaseController> extends StatelessWidget {
     return GetBuilder<T>(
       init: controller,
       builder: (controller) {
-        return RefreshIndicator(
-          key: controller.refreshIndicatorKey,
-          onRefresh: () async {
-            await controller.onRefresh();
-          },
-          child: vBuilder(context),
-        );
+        if (enableRefresh) {
+          return RefreshIndicator(
+            key: controller.refreshIndicatorKey,
+            onRefresh: () async {
+              await controller.onRefresh();
+            },
+            child: vBuilder(context),
+          );
+        } else {
+          return vBuilder(context);
+        }
       },
     );
   }

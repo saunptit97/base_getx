@@ -1,4 +1,5 @@
 import 'package:base_getx/repository/repositories.dart';
+import 'package:base_getx/utils/ad_helper.dart';
 import 'package:base_getx/utils/logger.dart';
 import 'package:base_getx/utils/utils.dart';
 import 'package:base_getx/widget/base_common_widget.dart';
@@ -37,9 +38,8 @@ class BaseController extends GetxController
   ScrollController? scrollController;
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  set setEnableScrollController(bool value) => withScrollController = value;
 
-  String interstitialAdId = 'ca-app-pub-3940256099942544/1033173712';
+  set setEnableScrollController(bool value) => withScrollController = value;
   InterstitialAd? _interstitialAd;
   int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
@@ -50,7 +50,6 @@ class BaseController extends GetxController
   );
 
   /// Inline ads
-  String bannerAdId = 'ca-app-pub-3940256099942544/9214589741';
   BannerAd? _anchoredAdaptiveAd;
   Orientation? _currentOrientation;
 
@@ -86,9 +85,8 @@ class BaseController extends GetxController
       print('Unable to get height of anchored banner.');
       return;
     }
-
     _anchoredAdaptiveAd = BannerAd(
-      adUnitId: bannerAdId,
+      adUnitId: AdHelper().bannerAdUnitId,
       size: size,
       request: AdRequest(),
       listener: BannerAdListener(
@@ -151,7 +149,7 @@ class BaseController extends GetxController
 
   void createInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: interstitialAdId,
+        adUnitId: AdHelper().interAdUnitId,
         request: request,
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
@@ -171,20 +169,30 @@ class BaseController extends GetxController
         ));
   }
 
-  Future<void> showInterstitialAd() async {
+  Future<void> showInterstitialAd({FullScreenContentCallback? callBack}) async {
     if (_interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
       return;
     }
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) =>
-          print('ad onAdShowedFullScreenContent.'),
+      onAdShowedFullScreenContent: (InterstitialAd ad) {
+        print('ad onAdShowedFullScreenContent.');
+        if (callBack?.onAdShowedFullScreenContent != null) {
+          callBack!.onAdShowedFullScreenContent!(ad);
+        }
+      },
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        if (callBack?.onAdDismissedFullScreenContent != null) {
+          callBack!.onAdDismissedFullScreenContent!(ad);
+        }
         print('$ad onAdDismissedFullScreenContent.');
         ad.dispose();
         createInterstitialAd();
       },
       onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        if (callBack?.onAdFailedToShowFullScreenContent != null) {
+          callBack!.onAdFailedToShowFullScreenContent!(ad, error);
+        }
         print('$ad onAdFailedToShowFullScreenContent: $error');
         ad.dispose();
         createInterstitialAd();
