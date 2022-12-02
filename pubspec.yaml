@@ -19,6 +19,7 @@ dependencies:
   in_app_review: ^2.0.4
   timeago: ^3.3.0
   google_mobile_ads: ^2.3.0
+  native_ads_flutter: ^1.0.7
 
 
 

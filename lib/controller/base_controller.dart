@@ -3,6 +3,7 @@ import 'package:base_getx/utils/ad_helper.dart';
 import 'package:base_getx/utils/logger.dart';
 import 'package:base_getx/utils/utils.dart';
 import 'package:base_getx/views/banner_ads_widget.dart';
+import 'package:base_getx/views/native_ads_widget.dart';
 import 'package:base_getx/widget/base_common_widget.dart';
 import 'package:base_getx/widget/widget_state_widget.dart';
 import 'package:flutter/material.dart';
@@ -104,6 +105,9 @@ class BaseController extends GetxController
   //   );
   //   return _anchoredAdaptiveAd!.load();
   // }
+  Widget getNativeAds() {
+    return NativeAdsWidget(height: 330, nativeId: AdHelper().nativeAdUnitId);
+  }
 
   Widget getAdWidget({AdSize adSize = AdSize.banner}) {
     return BannerAdsWidget(
