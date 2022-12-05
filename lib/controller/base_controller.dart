@@ -16,7 +16,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 /// --------------------------------------------
 /// [Example]
 ///
-/// class HomeController extends BaseController {
+/// class HomeController extends MyBaseController {
 ///
 ///   var count = 0.obs;
 ///
@@ -42,7 +42,7 @@ class BaseController extends GetxController
       GlobalKey<RefreshIndicatorState>();
 
   set setEnableScrollController(bool value) => withScrollController = value;
-  InterstitialAd? _interstitialAd;
+  InterstitialAd? interstitialAd;
   int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
 
@@ -164,14 +164,14 @@ class BaseController extends GetxController
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
             print('$ad loaded');
-            _interstitialAd = ad;
+            interstitialAd = ad;
             _numInterstitialLoadAttempts = 0;
-            _interstitialAd!.setImmersiveMode(true);
+            interstitialAd!.setImmersiveMode(true);
           },
           onAdFailedToLoad: (LoadAdError error) {
             print('InterstitialAd failed to load: $error.');
             _numInterstitialLoadAttempts += 1;
-            _interstitialAd = null;
+            interstitialAd = null;
             if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
               createInterstitialAd();
             }
@@ -180,15 +180,27 @@ class BaseController extends GetxController
   }
 
   Future<void> showInterstitialAd({FullScreenContentCallback? callBack}) async {
-    if (_interstitialAd == null) {
+    if (interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
       return;
     }
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+    interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (InterstitialAd ad) {
         print('ad onAdShowedFullScreenContent.');
         if (callBack?.onAdShowedFullScreenContent != null) {
           callBack!.onAdShowedFullScreenContent!(ad);
+        }
+      },
+      onAdImpression: (InterstitialAd? ad) {
+        print('ad onAdImpression.');
+        if (callBack?.onAdImpression != null) {
+          callBack!.onAdImpression!(ad);
+        }
+      },
+      onAdClicked: (InterstitialAd? ad) {
+        print('ad onAdClicked.');
+        if (callBack?.onAdClicked != null) {
+          callBack!.onAdClicked!(ad);
         }
       },
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
@@ -208,8 +220,8 @@ class BaseController extends GetxController
         createInterstitialAd();
       },
     );
-    await _interstitialAd!.show();
-    _interstitialAd = null;
+    await interstitialAd!.show();
+    interstitialAd = null;
     createInterstitialAd();
   }
 
@@ -230,7 +242,7 @@ class BaseController extends GetxController
 
   @override
   void onClose() {
-    _interstitialAd?.dispose();
+    interstitialAd?.dispose();
     super.onClose();
   }
 }
