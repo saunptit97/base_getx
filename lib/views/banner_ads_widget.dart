@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../controller/base_controller.dart';
-import '../utils/ad_helper.dart';
 
 class BannerAdsWidget extends StatefulWidget {
   const BannerAdsWidget({
     Key? key,
     required this.bannerId,
     required this.adSize,
+    this.onPaidEvent,
   }) : super(key: key);
   final String bannerId;
   final AdSize adSize;
-
+  final void Function(Ad, double, PrecisionType, String)? onPaidEvent;
   @override
   State<BannerAdsWidget> createState() => _BannerAdsWidgetState();
 }
@@ -116,6 +116,11 @@ class _BannerAdsWidgetState extends State<BannerAdsWidget> {
           adWidth = 0;
           setState(() {});
           ad.dispose();
+        },
+        onPaidEvent: (ad, valueMicros, precision, currencyCode) {
+          if (widget.onPaidEvent != null) {
+            widget.onPaidEvent!(ad, valueMicros, precision, currencyCode);
+          }
         },
       ),
     );

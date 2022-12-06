@@ -109,11 +109,15 @@ class BaseController extends GetxController
     return NativeAdsWidget(height: 330, nativeId: AdHelper().nativeAdUnitId);
   }
 
-  Widget getAdWidget({AdSize adSize = AdSize.banner}) {
+  Widget getAdWidget({
+    AdSize adSize = AdSize.banner,
+    dynamic onPaidEvent,
+  }) {
     return BannerAdsWidget(
       bannerId: AdHelper().bannerAdUnitId,
       adSize: adSize,
       key: UniqueKey(),
+      onPaidEvent: onPaidEvent,
     );
     // return OrientationBuilder(
     //   builder: (context, orientation) {
