@@ -92,10 +92,6 @@ class _Api extends GetConnect {
     _withToken = withToken;
     onInit();
 
-    Logger.showLog(method == Method.GET ? "GET" : "POST",
-        httpClient.baseUrl! + API_NAME + endPoint);
-    Logger.showLog("PARAMS", query.toString());
-    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res;
       if (method == Method.GET) {
@@ -105,20 +101,17 @@ class _Api extends GetConnect {
       }
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        Logger.showLog("LOADED", res.bodyString);
         // _result.status = true;
         // _result.body = res.body;
-        Logger.showLog("PARSING", "SUCCESS");
         return _result;
       } else {
-        Logger.showLog("ERROR 0", res.bodyString);
         // _result.status = true;
         // _result.isError = true;
         // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
         return _result;
       }
     } catch (e) {
-      Logger.showLog("ERROR 1", e.toString());
+      LoggerUtils.log(LogLevel.error, "ERROR: ${e.toString()}");
       // _result.status = true;
       // _result.isError = true;
       return _result;
@@ -134,29 +127,18 @@ class _Api extends GetConnect {
   }) async {
     _withToken = withToken;
     onInit();
-    Logger.showLog("GET", httpClient.baseUrl! + API_NAME + endPoint);
-    Logger.showLog("PARAMS", query.toString());
-    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res = await get(API_NAME + endPoint, query: query);
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        Logger.showLog("LOADED", res.bodyString!);
-        // _result = Result.fromJson(res.bodyString!);
-        // _result.body = res.body;
-        Logger.showLog("PARSING", "SUCCESS");
+        LoggerUtils.log(LogLevel.debug, "LOADED: ${res.bodyString}");
         return _result;
       } else {
-        Logger.showLog("ERROR 0", res.bodyString!);
-        // _result.status = true;
-        // _result.isError = true;
-        // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
+        LoggerUtils.log(LogLevel.error, "ERROR: ${res.bodyString}");
         return _result;
       }
     } catch (e) {
-      Logger.showLog("ERROR 1", e.toString());
-      // _result.status = true;
-      // _result.isError = true;
+      LoggerUtils.log(LogLevel.error, "ERROR: ${e.toString()}");
       return _result;
     }
   }
@@ -170,27 +152,21 @@ class _Api extends GetConnect {
   }) async {
     _withToken = withToken;
     onInit();
-    Logger.showLog("POST", httpClient.baseUrl! + API_NAME + endPoint);
-    Logger.showLog("PARAMS", data.toString());
-    Logger.showLog("TOKEN", _withToken.toString());
     try {
       var res = await httpClient.post(API_NAME + endPoint, body: data);
       _result = Result.fromJson(res.bodyString!);
       if (res.isOk) {
-        Logger.showLog("LOADED", res.bodyString!);
-        // _result = Result.fromJson(res.bodyString!);
-        // _result.body = res.body;
-        Logger.showLog("PARSING", "SUCCESS");
+        LoggerUtils.log(LogLevel.debug, "LOADED: ${res.bodyString}");
         return _result;
       } else {
-        Logger.showLog("ERROR 0", res.bodyString!);
+        LoggerUtils.log(LogLevel.error, "ERROR: ${res.bodyString}");
         // _result.status = true;
         // _result.isError = true;
         // _result.text = "Terjadi kesalahan, coba beberapa saat lagi...";
         return _result;
       }
     } catch (e) {
-      Logger.showLog("ERROR 1", e.toString());
+      LoggerUtils.log(LogLevel.error, "ERROR: ${e.toString()}");
       // _result.status = true;
       // _result.isError = true;
       return _result;

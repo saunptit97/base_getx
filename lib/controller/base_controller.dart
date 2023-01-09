@@ -59,10 +59,11 @@ class BaseController extends GetxController
   void onInit() {
     super.onInit();
     if (withScrollController) {
-      Logger.showLog(
+      LoggerUtils.log(
+        LogLevel.debug,
         "SCROLL CONTROLLER ENABLE on ${Get.currentRoute}",
-        withScrollController.toString(),
       );
+
       scrollController = ScrollController();
       scrollController?.addListener(_scrollListener);
     }

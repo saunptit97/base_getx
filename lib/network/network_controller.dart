@@ -26,7 +26,7 @@ class GetXNetworkManager extends BaseController {
       connectivityResult = await (_connectivity.checkConnectivity());
       return _updateState(connectivityResult);
     } on PlatformException catch (e) {
-      Logger.showLog("ERROR", e.toString());
+      LoggerUtils.log(LogLevel.error, "ERROR: ${e.toString()}");
     }
     return;
   }
