@@ -12,6 +12,7 @@ path_provider_ios=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.
 path_provider_linux=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.7/
 path_provider_macos=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.6/
 path_provider_windows=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.1.3/
+sqflite=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.2.2/
 store_redirect=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/store_redirect-2.0.1/
 url_launcher=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-6.0.20/
 url_launcher_android=/Users/saunt/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_android-6.0.22/

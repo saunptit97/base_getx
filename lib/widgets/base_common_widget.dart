@@ -1,4 +1,4 @@
-import 'package:base_getx/widget/dialog_message.dart';
+import 'package:base_getx/widgets/dialog_message.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
