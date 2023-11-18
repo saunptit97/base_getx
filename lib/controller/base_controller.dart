@@ -50,10 +50,16 @@ class BaseController extends GetxController
     keywords: <String>[],
     nonPersonalizedAds: true,
   );
+  bool initBanner = false;
+  bool initInteral = false;
 
-  // /// Inline ads
-  // BannerAd? _anchoredAdaptiveAd;
-  // Orientation? _currentOrientation;
+  /// Inline ads
+  BannerAd? _anchoredAdaptiveAd;
+  Orientation? _currentOrientation;
+
+  AdSize adSize = AdSize.fullBanner;
+
+  String BANNER_CONTROLLER_ID = "BANNER";
 
   @override
   void onInit() {
@@ -73,39 +79,38 @@ class BaseController extends GetxController
   @override
   void onReady() {
     super.onReady();
-    // loadAd();
+    loadAd();
   }
 
-  // void loadAd() async {
-  //   await _anchoredAdaptiveAd?.dispose();
-  //   _anchoredAdaptiveAd = null;
-  //   update();
-  //   _currentOrientation = MediaQuery.of(Get.context!).orientation;
-  //   final AnchoredAdaptiveBannerAdSize? size =
-  //       await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-  //           MediaQuery.of(Get.context!).size.width.truncate());
-  //   if (size == null) {
-  //     print('Unable to get height of anchored banner.');
-  //     return;
-  //   }
-  //   _anchoredAdaptiveAd = BannerAd(
-  //     adUnitId: AdHelper().bannerAdUnitId,
-  //     size: size,
-  //     request: AdRequest(),
-  //     listener: BannerAdListener(
-  //       onAdLoaded: (Ad ad) {
-  //         // When the ad is loaded, get the ad size and use it to set
-  //         // the height of the ad container.
-  //         _anchoredAdaptiveAd = ad as BannerAd;
-  //         update();
-  //       },
-  //       onAdFailedToLoad: (Ad ad, LoadAdError error) {
-  //         ad.dispose();
-  //       },
-  //     ),
-  //   );
-  //   return _anchoredAdaptiveAd!.load();
-  // }
+  void loadAd() async {
+    if (initBanner) {
+      print("Load Banner");
+      await _anchoredAdaptiveAd?.dispose();
+      _anchoredAdaptiveAd = null;
+      update([BANNER_CONTROLLER_ID]);
+
+      _anchoredAdaptiveAd = BannerAd(
+        adUnitId: AdHelper().bannerAdUnitId,
+        size: adSize,
+        request: const AdRequest(),
+        listener: BannerAdListener(
+          onAdLoaded: (Ad ad) {
+            // When the ad is loaded, get the ad size and use it to set
+            // the height of the ad container.
+            _anchoredAdaptiveAd = ad as BannerAd;
+            print("Load Banner success");
+
+            update([BANNER_CONTROLLER_ID]);
+          },
+          onAdFailedToLoad: (Ad ad, LoadAdError error) {
+            ad.dispose();
+          },
+        ),
+      );
+      return _anchoredAdaptiveAd!.load();
+    }
+  }
+
   Widget getNativeAds() {
     return NativeAdsWidget(height: 330, nativeId: AdHelper().nativeAdUnitId);
   }
@@ -144,6 +149,61 @@ class BaseController extends GetxController
     // );
   }
 
+  Widget showBannerAds() {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (_anchoredAdaptiveAd != null) {
+          return Container(
+            width: adSize.width.toDouble(),
+            height: adSize.height.toDouble(),
+            color: Colors.white,
+            child: Center(
+              child: AdWidget(ad: _anchoredAdaptiveAd!),
+            ),
+          );
+        }
+        // // Reload the ad if the orientation changes.
+        // if (_currentOrientation != orientation) {
+        //   print("Reload Banner");
+        //   _currentOrientation = orientation;
+        //   loadAd();
+        // }
+        return Container(
+          margin: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.yellow,
+              width: 1,
+            ),
+          ),
+          width: adSize.width.toDouble() + 10,
+          height: adSize.height.toDouble() + 10,
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  color: Colors.orange,
+                  child: const Text(
+                    "Ad",
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
+              const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.orange,
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> onRefresh() async {}
 
   Future<void> onLoadMore() async {}
@@ -163,7 +223,9 @@ class BaseController extends GetxController
   }
 
   void createInterstitialAd() {
-    InterstitialAd.load(
+    if (initInteral) {
+      print("create inters");
+      InterstitialAd.load(
         adUnitId: AdHelper().interAdUnitId,
         request: request,
         adLoadCallback: InterstitialAdLoadCallback(
@@ -181,7 +243,9 @@ class BaseController extends GetxController
               createInterstitialAd();
             }
           },
-        ));
+        ),
+      );
+    }
   }
 
   Future<void> showInterstitialAd({FullScreenContentCallback? callBack}) async {
